@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set Up Your Farm Profile | ZField</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--offwhite); }
+    .onboarding-wrap { min-height: 100vh; display: flex; flex-direction: column; }
+    .onboarding-header { background: var(--soil); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .onboarding-logo { font-family: var(--font-display); font-weight: 900; font-size: 20px; color: #fff; text-decoration: none; }
+    .onboarding-logo .z { color: var(--harvest); }
+    .step-indicator { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+    .onboarding-body { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 3rem 1.5rem; }
+    .onboarding-card { background: #fff; border-radius: var(--radius-xl); border: 1px solid var(--border); width: 100%; max-width: 600px; overflow: hidden; box-shadow: var(--shadow-lg); }
+    .onboarding-card-header { background: var(--parchment); padding: 2rem 2rem 1.5rem; border-bottom: 1px solid var(--border); }
+    .step-num-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--terracotta); margin-bottom: 6px; }
+    .step-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--soil); line-height: 1.2; margin-bottom: 6px; }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .onboarding-card-body { padding: 2rem; }
+    .onboarding-card-footer { padding: 1.25rem 2rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--offwhite); }
+    .btn-back { background: transparent; color: var(--muted); border: none; font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; padding: 10px 0; }
+    .btn-back:hover { color: var(--soil); }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+    .district-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+    .district-btn { padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--offwhite); font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--soil); cursor: pointer; transition: all 0.15s; text-align: center; }
+    .district-btn:hover { border-color: var(--terracotta); background: rgba(193,68,14,0.04); }
+    .district-btn.selected { border-color: var(--terracotta); background: rgba(193,68,14,0.08); font-weight: 600; }
+    .soil-card { display: flex; align-items: flex-start; gap: 14px; padding: 1rem 1.25rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: all 0.18s; background: var(--offwhite); margin-bottom: 10px; }
+    .soil-card:hover { border-color: var(--terracotta); }
+    .soil-card.selected { border-color: var(--terracotta); background: rgba(193,68,14,0.07); }
+    .soil-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .soil-name { font-size: 14px; font-weight: 600; color: var(--soil); margin-bottom: 3px; }
+    .soil-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label { font-size: 13px; color: var(--muted); }
+    .summary-val { font-size: 14px; font-weight: 600; color: var(--soil); }
+    .weather-fetched { background: rgba(58,125,68,0.08); border: 1px solid rgba(58,125,68,0.2); border-radius: var(--radius-md); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 12px; }
+    .weather-fetched-label { font-size: 12px; color: var(--leaf); font-weight: 600; margin-bottom: 2px; }
+    .weather-fetched-val { font-size: 14px; color: var(--soil); font-weight: 500; }
+    .week-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(193,68,14,0.1); color: var(--terracotta); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 100px; margin-top: 10px; }
+    .lang-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .lang-select-card { padding: 1rem 1.25rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: all 0.18s; background: var(--offwhite); }
+    .lang-select-card:hover { border-color: var(--terracotta); }
+    .lang-select-card.selected { border-color: var(--terracotta); background: rgba(193,68,14,0.07); }
+    .lang-select-name { font-size: 15px; font-weight: 600; color: var(--soil); }
+    .lang-select-region { font-size: 12px; color: var(--subtle); margin-top: 2px; }
+  </style>
+</head>
+<body>
+<div class="onboarding-wrap">
+  <div class="onboarding-header">
+    <a href="index.html" class="onboarding-logo"><span class="z">Z</span>Field</a>
+    <div class="step-indicator" id="step-indicator">Step 1 of 5</div>
+  </div>
+  <div class="onboarding-body">
+    <div class="onboarding-card">
+      <div style="height:4px;background:var(--parchment)">
+        <div id="progress-fill" style="height:100%;background:var(--terracotta);transition:width 0.4s ease;width:20%"></div>
+      </div>
+
+      <!-- STEP 1: CROP -->
+      <div class="step-panel active" id="step-1">
+        <div class="onboarding-card-header">
+          <div class="step-num-label">Step 1 of 5</div>
+          <div class="step-title">What are you growing?</div>
+          <div class="step-desc">Select your main crop. You can add more later.</div>
+        </div>
+        <div class="onboarding-card-body">
+          <div class="choice-grid">
+            <div class="choice-card" onclick="selectChoice(this,'crop','maize')"><div class="choice-icon">🌽</div><div class="choice-label">Maize</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','groundnuts')"><div class="choice-icon">🥜</div><div class="choice-label">Groundnuts</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','soybeans')"><div class="choice-icon">🫘</div><div class="choice-label">Soybeans</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','beans')"><div class="choice-icon">🫘</div><div class="choice-label">Beans</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','cassava')"><div class="choice-icon">🍠</div><div class="choice-label">Cassava</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','irish-potatoes')"><div class="choice-icon">🥔</div><div class="choice-label">Irish Potatoes</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','tomatoes')"><div class="choice-icon">🍅</div><div class="choice-label">Tomatoes</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','sweet-potatoes')"><div class="choice-icon">🍠</div><div class="choice-label">Sweet Potatoes</div></div>
+            <div class="choice-card" onclick="selectChoice(this,'crop','vegetables')"><div class="choice-icon">🥬</div><div class="choice-label">Vegetables</div></div>
+          </div>
+        </div>
+        <div class="onboarding-card-footer">
+          <div></div>
+          <button class="btn btn-primary" onclick="nextStep()" id="btn-next-1" disabled>Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: PLANTING DATE -->
+      <div class="step-panel" id="step-2">
+        <div class="onboarding-card-header">
+          <div class="step-num-label">Step 2 of 5</div>
+          <div class="step-title">When did you plant?</div>
+          <div class="step-desc">This helps ZField track your crop growth stage and time every recommendation correctly.</div>
+        </div>
+        <div class="onboarding-card-body">
+          <div class="form-group">
+            <label class="form-label">Planting date</label>
+            <input type="date" class="form-input" id="planting-date" onchange="onDateChange()" max="">
+            <div class="form-hint">If you are not sure of the exact date, pick the closest Monday to when you planted.</div>
+          </div>
+          <div id="week-display" style="display:none">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Your crop is currently at:</div>
+            <div class="week-badge" id="week-badge-text">Week 0</div>
+          </div>
+        </div>
+        <div class="onboarding-card-footer">
+          <button class="btn-back" onclick="prevStep()">Back</button>
+          <button class="btn btn-primary" onclick="nextStep()" id="btn-next-2" disabled>Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: DISTRICT -->
+      <div class="step-panel" id="step-3">
+        <div class="onboarding-card-header">
+          <div class="step-num-label">Step 3 of 5</div>
+          <div class="step-title">Which district is your farm in?</div>
+          <div class="step-desc">ZField uses this to pull live weather data for your exact area automatically.</div>
+        </div>
+        <div class="onboarding-card-body">
+          <div class="form-group">
+            <label class="form-label">Search district <span>(or scroll below)</span></label>
+            <input type="text" class="form-input" id="district-search" placeholder="Type to filter..." oninput="filterDistricts(this.value)">
+          </div>
+          <div class="district-grid" id="district-grid"></div>
+          <div id="weather-fetch-result" style="margin-top:1rem;display:none"></div>
+        </div>
+        <div class="onboarding-card-footer">
+          <button class="btn-back" onclick="prevStep()">Back</button>
+          <button class="btn btn-primary" onclick="fetchWeatherAndNext()" id="btn-next-3" disabled>Fetch My Weather</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: SOIL -->
+      <div class="step-panel" id="step-4">
+        <div class="onboarding-card-header">
+          <div class="step-num-label">Step 4 of 5</div>
+          <div class="step-title">What is your soil like?</div>
+          <div class="step-desc">This helps ZField give you accurate fertilizer timing and moisture advice.</div>
+        </div>
+        <div class="onboarding-card-body">
+          <div class="soil-card" onclick="selectSoil(this,'sandy')">
+            <div class="soil-icon">🏖</div>
+            <div><div class="soil-name">Sandy soil</div><div class="soil-desc">Light, drains fast, dries out quickly. Common in lower elevation areas. Needs more frequent watering and fertilizer.</div></div>
+          </div>
+          <div class="soil-card" onclick="selectSoil(this,'loam')">
+            <div class="soil-icon">🌱</div>
+            <div><div class="soil-name">Loam soil</div><div class="soil-desc">Dark, crumbly, holds moisture well. The best soil for most crops. Good drainage and nutrient retention.</div></div>
+          </div>
+          <div class="soil-card" onclick="selectSoil(this,'clay')">
+            <div class="soil-icon">🟤</div>
+            <div><div class="soil-name">Clay soil</div><div class="soil-desc">Heavy, sticky when wet, cracks when dry. Retains water for a long time. Common in low-lying areas and river valleys.</div></div>
+          </div>
+          <div class="soil-card" onclick="selectSoil(this,'black-cotton')">
+            <div class="soil-icon">⚫</div>
+            <div><div class="soil-name">Black cotton soil</div><div class="soil-desc">Very expansive, very sticky when wet. Waterlogging risk. Common in parts of the Lower Shire and lake shore areas.</div></div>
+          </div>
+          <div class="soil-card" onclick="selectSoil(this,'not-sure')">
+            <div class="soil-icon">🤷</div>
+            <div><div class="soil-name">Not sure</div><div class="soil-desc">That is fine. ZField will use general recommendations and ask you a few simple questions to learn your soil better.</div></div>
+          </div>
+        </div>
+        <div class="onboarding-card-footer">
+          <button class="btn-back" onclick="prevStep()">Back</button>
+          <button class="btn btn-primary" onclick="nextStep()" id="btn-next-4" disabled>Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: LANGUAGE -->
+      <div class="step-panel" id="step-5">
+        <div class="onboarding-card-header">
+          <div class="step-num-label">Step 5 of 5</div>
+          <div class="step-title">Which language do you prefer?</div>
+          <div class="step-desc">ZField will give you advice and answer your questions in this language.</div>
+        </div>
+        <div class="onboarding-card-body">
+          <div class="lang-select-grid">
+            <div class="lang-select-card" onclick="selectLang(this,'en')"><div class="lang-select-name">English</div><div class="lang-select-region">Official language</div></div>
+            <div class="lang-select-card" onclick="selectLang(this,'ny')"><div class="lang-select-name">Chichewa</div><div class="lang-select-region">All of Malawi</div></div>
+            <div class="lang-select-card" onclick="selectLang(this,'tum')"><div class="lang-select-name">Chitumbuka</div><div class="lang-select-region">Northern Malawi</div></div>
+            <div class="lang-select-card" onclick="selectLang(this,'yao')"><div class="lang-select-name">Yao</div><div class="lang-select-region">Southern Malawi</div></div>
+            <div class="lang-select-card" onclick="selectLang(this,'lom')"><div class="lang-select-name">Lomwe</div><div class="lang-select-region">Southern Malawi</div></div>
+            <div class="lang-select-card" onclick="selectLang(this,'lib')"><div class="lang-select-name">Liberian English</div><div class="lang-select-region">West Africa</div></div>
+          </div>
+          <div style="margin-top:1.75rem;padding-top:1.75rem;border-top:1px solid var(--border)">
+            <div style="font-size:13px;font-weight:600;color:var(--earth);margin-bottom:1rem">Your farm profile summary</div>
+            <div id="summary-content"></div>
+          </div>
+        </div>
+        <div class="onboarding-card-footer">
+          <button class="btn-back" onclick="prevStep()">Back</button>
+          <button class="btn btn-primary" onclick="saveAndLaunch()" id="btn-next-5" disabled>Launch ZField</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const DISTRICTS = [
+  {name:'Lilongwe',lat:-13.9669,lon:33.7873},{name:'Blantyre',lat:-15.7861,lon:35.0058},
+  {name:'Mzuzu',lat:-11.4656,lon:34.0207},{name:'Zomba',lat:-15.3833,lon:35.3167},
+  {name:'Kasungu',lat:-13.0333,lon:33.4833},{name:'Dedza',lat:-14.3667,lon:34.3333},
+  {name:'Mchinji',lat:-13.7961,lon:32.8883},{name:'Salima',lat:-13.7833,lon:34.45},
+  {name:'Ntcheu',lat:-14.8167,lon:34.6333},{name:'Ntchisi',lat:-13.3833,lon:33.8833},
+  {name:'Dowa',lat:-13.6500,lon:33.9333},{name:'Nkhotakota',lat:-12.9258,lon:34.2961},
+  {name:'Balaka',lat:-14.9833,lon:34.9667},{name:'Chiradzulu',lat:-15.6667,lon:35.1667},
+  {name:'Machinga',lat:-15.1833,lon:35.5167},{name:'Mangochi',lat:-14.4769,lon:35.2647},
+  {name:'Mulanje',lat:-15.9667,lon:35.5},{name:'Mwanza',lat:-15.6078,lon:34.5200},
+  {name:'Neno',lat:-15.3667,lon:34.6500},{name:'Nsanje',lat:-16.9167,lon:35.2667},
+  {name:'Phalombe',lat:-15.8000,lon:35.6500},{name:'Thyolo',lat:-16.0667,lon:35.1333},
+  {name:'Chikwawa',lat:-16.0333,lon:34.8000},{name:'Rumphi',lat:-11.0167,lon:33.8667},
+  {name:'Mzimba',lat:-11.9000,lon:33.6000},{name:'Nkhata Bay',lat:-11.6000,lon:34.2833},
+  {name:'Karonga',lat:-9.9333,lon:33.9333},{name:'Chitipa',lat:-9.7000,lon:33.2667},
+];
+
+let profile = {crop:null,plantingDate:null,district:null,districtCoords:null,soilType:null,language:null,weather:null};
+let currentStep = 1;
+
+function renderDistricts(list) {
+  const grid = document.getElementById('district-grid');
+  grid.innerHTML = '';
+  list.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'district-btn' + (profile.district === d.name ? ' selected' : '');
+    btn.textContent = d.name;
+    btn.onclick = () => selectDistrict(btn, d);
+    grid.appendChild(btn);
+  });
+}
+
+renderDistricts(DISTRICTS);
+document.getElementById('planting-date').max = new Date().toISOString().split('T')[0];
+
+function filterDistricts(q) {
+  renderDistricts(q ? DISTRICTS.filter(d => d.name.toLowerCase().includes(q.toLowerCase())) : DISTRICTS);
+}
+
+function selectDistrict(btn, district) {
+  document.querySelectorAll('.district-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  profile.district = district.name;
+  profile.districtCoords = {lat: district.lat, lon: district.lon};
+  document.getElementById('btn-next-3').disabled = false;
+  document.getElementById('weather-fetch-result').style.display = 'none';
+}
+
+async function fetchWeatherAndNext() {
+  if (!profile.district) return;
+  const btn = document.getElementById('btn-next-3');
+  btn.textContent = 'Fetching weather...';
+  btn.disabled = true;
+  try {
+    const {lat, lon} = profile.districtCoords;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code&daily=precipitation_sum,temperature_2m_max,temperature_2m_min&timezone=Africa%2FBlantyre&forecast_days=7`;
+    const res = await fetch(url);
+    const data = await res.json();
+    profile.weather = {
+      temp: Math.round(data.current.temperature_2m),
+      humidity: Math.round(data.current.relative_humidity_2m),
+      windSpeed: Math.round(data.current.wind_speed_10m),
+      precipitation: data.current.precipitation,
+      dailyRain: data.daily.precipitation_sum,
+      dailyMaxTemp: data.daily.temperature_2m_max,
+      dailyMinTemp: data.daily.temperature_2m_min,
+      fetchedAt: new Date().toISOString(),
+    };
+    const r = document.getElementById('weather-fetch-result');
+    r.style.display = 'block';
+    r.innerHTML = `<div class="weather-fetched"><div style="font-size:1.75rem">✅</div><div><div class="weather-fetched-label">Live weather loaded for ${profile.district}</div><div class="weather-fetched-val">${profile.weather.temp}°C · Humidity ${profile.weather.humidity}% · Wind ${profile.weather.windSpeed} km/h</div></div></div>`;
+    btn.textContent = 'Next';
+    btn.disabled = false;
+    btn.onclick = nextStep;
+  } catch(err) {
+    const r = document.getElementById('weather-fetch-result');
+    r.style.display = 'block';
+    r.innerHTML = `<div class="alert alert-warning"><span class="alert-icon">⚠</span><span>Could not fetch weather right now. ZField will try again when you open the app. You can still continue.</span></div>`;
+    btn.textContent = 'Continue Anyway';
+    btn.disabled = false;
+    btn.onclick = nextStep;
+  }
+}
+
+function selectChoice(el, field, value) {
+  el.closest('.choice-grid').querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  profile[field] = value;
+  document.getElementById('btn-next-' + currentStep).disabled = false;
+}
+
+function selectSoil(el, value) {
+  document.querySelectorAll('.soil-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  profile.soilType = value;
+  document.getElementById('btn-next-4').disabled = false;
+}
+
+function selectLang(el, value) {
+  document.querySelectorAll('.lang-select-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  profile.language = value;
+  document.getElementById('btn-next-5').disabled = false;
+}
+
+function onDateChange() {
+  const val = document.getElementById('planting-date').value;
+  if (!val) return;
+  profile.plantingDate = val;
+  const diffDays = Math.floor((new Date() - new Date(val)) / 86400000);
+  const weeks = Math.max(0, Math.floor(diffDays / 7));
+  document.getElementById('week-display').style.display = 'block';
+  document.getElementById('week-badge-text').textContent = weeks === 0 ? 'Planted this week' : 'Week ' + weeks;
+  document.getElementById('btn-next-2').disabled = false;
+}
+
+function updateProgress() {
+  document.getElementById('progress-fill').style.width = ((currentStep / 5) * 100) + '%';
+  document.getElementById('step-indicator').textContent = 'Step ' + currentStep + ' of 5';
+}
+
+function nextStep() {
+  if (currentStep < 5) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep++;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    updateProgress();
+    if (currentStep === 5) buildSummary();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) {
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    currentStep--;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    updateProgress();
+  }
+}
+
+function buildSummary() {
+  const cropNames = {maize:'Maize',groundnuts:'Groundnuts',soybeans:'Soybeans',beans:'Beans',cassava:'Cassava','irish-potatoes':'Irish Potatoes',tomatoes:'Tomatoes','sweet-potatoes':'Sweet Potatoes',vegetables:'Vegetables'};
+  const soilNames = {sandy:'Sandy soil',loam:'Loam soil',clay:'Clay soil','black-cotton':'Black cotton soil','not-sure':'Not confirmed'};
+  const planted = new Date(profile.plantingDate);
+  const weeks = Math.max(0, Math.floor((new Date() - planted) / 604800000));
+  document.getElementById('summary-content').innerHTML = `
+    <div class="summary-row"><span class="summary-label">Crop</span><span class="summary-val">${cropNames[profile.crop]||profile.crop}</span></div>
+    <div class="summary-row"><span class="summary-label">Planted</span><span class="summary-val">${planted.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} &middot; Week ${weeks}</span></div>
+    <div class="summary-row"><span class="summary-label">District</span><span class="summary-val">${profile.district}</span></div>
+    <div class="summary-row"><span class="summary-label">Weather</span><span class="summary-val">${profile.weather ? profile.weather.temp+'°C &middot; Live data loaded' : 'Will fetch on app load'}</span></div>
+    <div class="summary-row"><span class="summary-label">Soil type</span><span class="summary-val">${soilNames[profile.soilType]||profile.soilType}</span></div>
+  `;
+}
+
+function saveAndLaunch() {
+  profile.savedAt = new Date().toISOString();
+  localStorage.setItem('zfield_profile', JSON.stringify(profile));
+  window.location.href = 'app.html';
+}
+</script>
+</body>
+</html>
